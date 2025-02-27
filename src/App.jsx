@@ -1,20 +1,27 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './Components/Login';
-import Dashboard from './Components/Dashboard';
-import ForgotPassword from './Components/ForgotPassword';
-import SignUp from './Components/SignUp';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+// Import your page components
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/signup" element={<SignUp />} />
+        {/* Auth pages */}
+        <Route path="/login" element={<LoginPage />} />
+        
+        {/* Protected pages */}
+        <Route path="/dashboard" element={<DashboardPage />} />
+        
+        {/* Default route - redirect to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        
+        {/* Catch all route - redirect to login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 
