@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Import your page components
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage'; 
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 
 function App() {
@@ -11,14 +13,14 @@ function App() {
       <Routes>
         {/* Auth pages */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         
         {/* Protected pages */}
         <Route path="/dashboard" element={<DashboardPage />} />
         
         {/* Default route - redirect to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
-        
-        {/* Catch all route - redirect to login */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

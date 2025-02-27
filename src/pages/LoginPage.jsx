@@ -2,19 +2,21 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box, Link } from '@mui/material';
 
-const LoginPage = () => {
+const Login = () => {
   const [identifier, setIdentifier] = useState(''); // Can be username or email
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  
+
   const handleLogin = (e) => {
     e.preventDefault();
+
     // Basic validation
     if (!identifier || !password) {
       setError('Please enter both username/email and password.');
       return;
     }
+
     // Simulate login logic (replace with actual API call)
     const isEmail = identifier.includes('@'); // Simple check to determine if input is an email
     if (
@@ -22,32 +24,21 @@ const LoginPage = () => {
       (!isEmail && identifier === 'admin' && password === 'password')
     ) {
       setError('');
-      
-      // Store user in localStorage
-      const mockUser = {
-        id: 1,
-        firstName: 'Admin',
-        lastName: 'User',
-        email: 'admin@example.com'
-      };
-      localStorage.setItem('token', 'mock-jwt-token');
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      
       alert('Login successful!');
       navigate('/dashboard'); // Redirect to dashboard
     } else {
       setError('Invalid username/email or password.');
     }
   };
-  
+
   const handleForgotPassword = () => {
     navigate('/forgot-password'); // Redirect to forgot password page
   };
-  
+
   const handleSignUp = () => {
     navigate('/signup'); // Redirect to signup page
   };
-  
+
   return (
     <Container maxWidth="sm">
       <Box
@@ -117,4 +108,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default Login;
