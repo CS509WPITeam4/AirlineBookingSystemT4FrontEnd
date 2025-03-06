@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage'; 
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
+import FlightList from './pages/FlightList';
 
 function App() {
   return (
@@ -18,6 +19,9 @@ function App() {
         
         {/* Protected pages */}
         <Route path="/dashboard" element={<DashboardPage />} />
+
+        {/* Flight pages */}
+        <Route path="/flights" element={<FlightList />} />
         
         {/* Default route - redirect to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
