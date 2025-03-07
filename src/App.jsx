@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-
 // Import your page components
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -19,8 +18,8 @@ function App() {
         
         {/* Flight pages */}
         <Route path="/flight/:flightId" element={<FlightDetailsPage />} />
-        <Route path="/search-flights" element={<Navigate to="/flight/FL123" replace />} /> {/* Temporary: Redirect to a sample flight */}
-        <Route path="/booking/:flightId" element={<Navigate to="/dashboard" replace />} /> {/* Temporary redirect */}
+        <Route path="/search-flights" element={<Navigate to="/flight/FL123" replace />} />
+        <Route path="/booking/:flightId" element={<Navigate to="/dashboard" replace />} />
         
         {/* Protected pages */}
         <Route path="/dashboard" element={<DashboardPage />} />
