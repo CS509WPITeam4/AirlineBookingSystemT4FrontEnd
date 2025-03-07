@@ -3,9 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Import your page components
 import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage'; 
+import SignupPage from './pages/SignupPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
+import FlightDetailsPage from './pages/FlightDetailsPage';
 
 function App() {
   return (
@@ -15,6 +16,11 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        
+        {/* Flight pages */}
+        <Route path="/flight/:flightId" element={<FlightDetailsPage />} />
+        <Route path="/search-flights" element={<Navigate to="/flight/FL123" replace />} /> {/* Temporary: Redirect to a sample flight */}
+        <Route path="/booking/:flightId" element={<Navigate to="/dashboard" replace />} /> {/* Temporary redirect */}
         
         {/* Protected pages */}
         <Route path="/dashboard" element={<DashboardPage />} />
