@@ -42,12 +42,7 @@ const SignupPage = () => {
     username: '',
     password: '',
     confirmPassword: '',
-    phoneNumber: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: ''
+    phoneNumber: ''
   });
 
   const handleChange = (e) => {
@@ -62,7 +57,7 @@ const SignupPage = () => {
         setError('Please fill in all required fields.');
         return;
       }
-      
+
       if (!validateEmail(formData.email)) {
         setError('Please enter a valid email address.');
         return;
@@ -73,18 +68,18 @@ const SignupPage = () => {
         setError('Please fill in all required fields.');
         return;
       }
-      
+
       if (formData.password !== formData.confirmPassword) {
         setError('Passwords do not match.');
         return;
       }
-      
+
       if (formData.password.length < 8) {
         setError('Password must be at least 8 characters long.');
         return;
       }
     }
-    
+
     setError('');
     setActiveStep((prevStep) => prevStep + 1);
   };
@@ -101,17 +96,17 @@ const SignupPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     setIsLoading(true);
     setError('');
-    
+
     try {
       // Using the API URL directly in the component
       const response = await axios.post(API_URL, formData);
-      
+
       // Handle successful registration
-      navigate('/login', { 
-        state: { message: 'Registration successful! Please log in.' } 
+      navigate('/login', {
+        state: { message: 'Registration successful! Please log in.' }
       });
     } catch (err) {
       console.error('Registration error:', err);
@@ -125,7 +120,7 @@ const SignupPage = () => {
     navigate('/login');
   };
 
-  const steps = ['Personal Information', 'Account Details', 'Address Information'];
+  const steps = ['Personal Information', 'Account Details'];
 
   const renderStepContent = (step) => {
     switch (step) {
@@ -213,58 +208,6 @@ const SignupPage = () => {
                   label="Confirm Password"
                   type="password"
                   value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
-              </Grid>
-            </Grid>
-          </>
-        );
-      case 2:
-        return (
-          <>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  name="address"
-                  fullWidth
-                  label="Address"
-                  value={formData.address}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="city"
-                  fullWidth
-                  label="City"
-                  value={formData.city}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="state"
-                  fullWidth
-                  label="State/Province"
-                  value={formData.state}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="zipCode"
-                  fullWidth
-                  label="Zip / Postal Code"
-                  value={formData.zipCode}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="country"
-                  fullWidth
-                  label="Country"
-                  value={formData.country}
                   onChange={handleChange}
                 />
               </Grid>
