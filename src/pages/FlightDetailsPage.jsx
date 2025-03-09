@@ -35,7 +35,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   borderRadius: '8px',
 }));
 
-const BookingPage = () => {
+const FlightDetailsPage = () => {
   const { flightId } = useParams();
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
@@ -610,4 +610,4 @@ const BookingPage = () => {
   );
 };
 
-export default BookingPage;
+export default FlightDetailsPage;
