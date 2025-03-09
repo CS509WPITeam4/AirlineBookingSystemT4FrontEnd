@@ -8,10 +8,7 @@ import {
   Box, 
   Link, 
   Grid, 
-  Paper,
-  Stepper,
-  Step,
-  StepLabel
+  Paper
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
@@ -27,27 +24,18 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 const SignupPage = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   // API endpoint - directly defined here instead of importing from config
-  const API_URL = 'https://your-backend-api-url.com/api/auth/register';
-  
+  const API_URL = 'http://localhost:8080/api/users/signup';
+
   // User information
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
     email: '',
     username: '',
     password: '',
-    confirmPassword: '',
-    phoneNumber: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: ''
+    confirmPassword: ''
   });
 
   const handleChange = (e) => {
@@ -55,43 +43,29 @@ const SignupPage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleNext = () => {
-    if (activeStep === 0) {
-      // Validate first step fields
-      if (!formData.firstName || !formData.lastName || !formData.email) {
-        setError('Please fill in all required fields.');
-        return;
-      }
-      
-      if (!validateEmail(formData.email)) {
-        setError('Please enter a valid email address.');
-        return;
-      }
-    } else if (activeStep === 1) {
-      // Validate second step fields
-      if (!formData.username || !formData.password || !formData.confirmPassword) {
-        setError('Please fill in all required fields.');
-        return;
-      }
-      
-      if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match.');
-        return;
-      }
-      
-      if (formData.password.length < 8) {
-        setError('Password must be at least 8 characters long.');
-        return;
-      }
+  const validateFields = () => {
+    if (!formData.email || !formData.username || !formData.password || !formData.confirmPassword) {
+      setError('Please fill in all required fields.');
+      return false;
     }
-    
-    setError('');
-    setActiveStep((prevStep) => prevStep + 1);
-  };
 
-  const handleBack = () => {
+    if (!validateEmail(formData.email)) {
+      setError('Please enter a valid email address.');
+      return false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match.');
+      return false;
+    }
+
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      return false;
+    }
+
     setError('');
-    setActiveStep((prevStep) => prevStep - 1);
+    return true;
   };
 
   const validateEmail = (email) => {
@@ -101,17 +75,20 @@ const SignupPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    if (!validateFields()) {
+      return;
+    }
+
     setIsLoading(true);
-    setError('');
-    
+
     try {
       // Using the API URL directly in the component
       const response = await axios.post(API_URL, formData);
-      
+
       // Handle successful registration
-      navigate('/login', { 
-        state: { message: 'Registration successful! Please log in.' } 
+      navigate('/login', {
+        state: { message: 'Registration successful! Please log in.' }
       });
     } catch (err) {
       console.error('Registration error:', err);
@@ -125,35 +102,30 @@ const SignupPage = () => {
     navigate('/login');
   };
 
-  const steps = ['Personal Information', 'Account Details', 'Address Information'];
+  return (
+    <Container maxWidth="md">
+      <Box
+        sx={{
+          marginTop: 8,
+          marginBottom: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <StyledPaper sx={{ width: '100%' }}>
+          <Typography component="h1" variant="h4" sx={{ mb: 3, color: 'primary.main' }}>
+            Create an Account
+          </Typography>
 
-  const renderStepContent = (step) => {
-    switch (step) {
-      case 0:
-        return (
-          <>
+          {error && (
+            <Typography color="error" sx={{ mt: 1, mb: 2 }}>
+              {error}
+            </Typography>
+          )}
+
+          <Box component="form" sx={{ mt: 1, width: '100%' }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="firstName"
-                  required
-                  fullWidth
-                  label="First Name"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="lastName"
-                  required
-                  fullWidth
-                  label="Last Name"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                />
-              </Grid>
               <Grid item xs={12}>
                 <TextField
                   name="email"
@@ -166,22 +138,6 @@ const SignupPage = () => {
                   autoComplete="email"
                 />
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  name="phoneNumber"
-                  fullWidth
-                  label="Phone Number"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                />
-              </Grid>
-            </Grid>
-          </>
-        );
-      case 1:
-        return (
-          <>
-            <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
                   name="username"
@@ -217,125 +173,17 @@ const SignupPage = () => {
                 />
               </Grid>
             </Grid>
-          </>
-        );
-      case 2:
-        return (
-          <>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  name="address"
-                  fullWidth
-                  label="Address"
-                  value={formData.address}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="city"
-                  fullWidth
-                  label="City"
-                  value={formData.city}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="state"
-                  fullWidth
-                  label="State/Province"
-                  value={formData.state}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="zipCode"
-                  fullWidth
-                  label="Zip / Postal Code"
-                  value={formData.zipCode}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="country"
-                  fullWidth
-                  label="Country"
-                  value={formData.country}
-                  onChange={handleChange}
-                />
-              </Grid>
-            </Grid>
-          </>
-        );
-      default:
-        return null;
-    }
-  };
 
-  return (
-    <Container maxWidth="md">
-      <Box
-        sx={{
-          marginTop: 8,
-          marginBottom: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <StyledPaper sx={{ width: '100%' }}>
-          <Typography component="h1" variant="h4" sx={{ mb: 3, color: 'primary.main' }}>
-            Create an Account
-          </Typography>
-          
-          <Stepper activeStep={activeStep} sx={{ width: '100%', mb: 4 }}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-          
-          {error && (
-            <Typography color="error" sx={{ mt: 1, mb: 2 }}>
-              {error}
-            </Typography>
-          )}
-          
-          <Box component="form" sx={{ mt: 1, width: '100%' }}>
-            {renderStepContent(activeStep)}
-            
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-              <Button
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{ mr: 1 }}
-              >
-                Back
-              </Button>
               <Box>
-                {activeStep === steps.length - 1 ? (
-                  <Button
-                    variant="contained"
-                    onClick={handleSubmit}
-                    disabled={isLoading}
-                    sx={{ py: 1.5, px: 4 }}
-                  >
-                    {isLoading ? 'Creating Account...' : 'Create Account'}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    onClick={handleNext}
-                    sx={{ py: 1.5, px: 4 }}
-                  >
-                    Next
-                  </Button>
-                )}
+                <Button
+                  variant="contained"
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                  sx={{ py: 1.5, px: 4 }}
+                >
+                  {isLoading ? 'Creating Account...' : 'Create Account'}
+                </Button>
               </Box>
             </Box>
           </Box>

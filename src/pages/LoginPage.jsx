@@ -63,7 +63,6 @@ const LoginPage = () => {
       };
       localStorage.setItem('user', JSON.stringify(mockUser));
       
-      alert('Login successful!');
       navigate('/dashboard'); // Redirect to dashboard
     } else {
       setError('Invalid username/email or password.');
