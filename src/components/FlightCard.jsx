@@ -11,6 +11,8 @@ import {
   Grid,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import deltaLogo from '../assets/images/delta.png';
+import southwestLogo from '../assets/images/southwest.png';
 
 const StyledCard = styled(Card)(({ theme, selected }) => ({
   border: selected ? `2px solid ${theme.palette.primary.main}` : "none",
@@ -20,6 +22,19 @@ const StyledCard = styled(Card)(({ theme, selected }) => ({
     transform: "scale(1.02)",
   },
 }));
+
+// Makes date and time readable
+const formatDate = (dateTime) => {
+  const date = new Date(dateTime);
+  return date.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  });
+};
 
 const FlightCard = ({ flight }) => {
   const navigate = useNavigate();
@@ -34,8 +49,14 @@ const FlightCard = ({ flight }) => {
       {/* Airline Logo */}
       <CardMedia
         component="img"
-        height="40"
-        image={flight.airlineLogoUrl}
+        height="30"
+        image={
+          flight.flightNumber.startsWith('DL') 
+            ? deltaLogo 
+            : flight.flightNumber.startsWith('WN')
+            ? southwestLogo
+            : none.png
+        }
         alt={`${flight.airlineName} Logo`}
         sx={{ objectFit: "contain", padding: "10px" }}
       />
@@ -48,33 +69,39 @@ const FlightCard = ({ flight }) => {
         {/* Flight Route */}
         <Grid container spacing={1} alignItems="center">
           <Grid item xs={5}>
-            <Typography variant="subtitle1">{flight.departureAirport} ({flight.departureCity})</Typography>
+            <Typography variant="subtitle1">{flight.departAirport}</Typography>
           </Grid>
           <Grid item xs={2} textAlign="center">
             <Typography variant="h6">→</Typography>
           </Grid>
           <Grid item xs={5}>
-            <Typography variant="subtitle1">{flight.arrivalAirport} ({flight.arrivalCity})</Typography>
+            <Typography variant="subtitle1">{flight.arriveAirport}</Typography>
           </Grid>
         </Grid>
 
         {/* Flight Time & Duration */}
         <Typography variant="body2" color="textSecondary">
-          Departure: {flight.departureTime}
+          ____________________________________
         </Typography>
         <Typography variant="body2" color="textSecondary">
-          Arrival: {flight.arrivalTime}
+          Departure:
         </Typography>
-        <Typography variant="body2" sx={{ fontStyle: "italic", mt: 1 }}>
-          Duration: {flight.flightDuration}
+        <Typography variant="body2" color="textSecondary">
+          {formatDate(flight.departDateTime)}
         </Typography>
+        <Typography variant="body2" color="textSecondary">
+          ____________________________________
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          Arrival:
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          {formatDate(flight.arriveDateTime)}
+        </Typography>
+        
 
         {/* Price & Buttons */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            ${flight.ticketPrice}
-          </Typography>
-
+        <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
           {flight.soldOut ? (
             <Chip label="Sold Out" color="error" />
           ) : (

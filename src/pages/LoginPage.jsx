@@ -61,6 +61,7 @@ const LoginPage = () => {
         lastName: 'User',
         email: 'admin@example.com'
       };
+      localStorage.setItem('token', 'mock-jwt-token');
       localStorage.setItem('user', JSON.stringify(mockUser));
       
       navigate('/dashboard'); // Redirect to dashboard
