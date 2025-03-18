@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box, Link, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import axios from 'axios';
+
+const API_URL = 'http://localhost:8080/api/users/login';
 
 // Styled components
 const LoginPaper = styled(Paper)(({ theme }) => ({
@@ -38,44 +41,34 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  
-  const handleLogin = (e) => {
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Basic validation
     if (!identifier || !password) {
       setError('Please enter both username/email and password.');
       return;
     }
-    // Simulate login logic (replace with actual API call)
-    const isEmail = identifier.includes('@'); // Simple check to determine if input is an email
-    if (
-      (isEmail && identifier === 'admin@example.com' && password === 'password') ||
-      (!isEmail && identifier === 'admin' && password === 'password')
-    ) {
-      setError('');
-      
-      // Store user in localStorage
-      const mockUser = {
-        id: 1,
-        firstName: 'Admin',
-        lastName: 'User',
-        email: 'admin@example.com'
-      };
-      localStorage.setItem('token', 'mock-jwt-token');
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      
-      navigate('/dashboard'); // Redirect to dashboard
-    } else {
-      setError('Invalid username/email or password.');
+
+    try {
+    const loginData = identifier.includes('@')
+      ? { email: identifier, password }
+      : { username: identifier, password };
+
+    const response = await axios.post(API_URL, loginData);
+
+      localStorage.setItem('token', response.data.token);
+      navigate('/dashboard');
+    } catch (error) {
+      setError(error.response?.data?.message || 'Failed to connect to the server. Please try again.');
     }
   };
   
   const handleForgotPassword = () => {
-    navigate('/forgot-password'); // Redirect to forgot password page
+    navigate('/forgot-password');
   };
   
   const handleSignUp = () => {
-    navigate('/signup'); // Redirect to signup page
+    navigate('/signup');
   };
   
   return (
