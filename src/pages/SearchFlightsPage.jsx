@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Container, Box, Autocomplete, TextField, Button, CircularProgress, Typography, Grid, Alert } from '@mui/material';
+import { Container, Box, Autocomplete, TextField, Button, CircularProgress, Typography, Grid, Alert, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import DestinationGallery from '../components/DestinationGallery';
 import FlightCard from '../components/FlightCard';
 
@@ -11,12 +11,14 @@ const SearchFlightsPage = () => {
   const [loading, setLoading] = useState(true);
   const [flights, setFlights] = useState([]);
   const [error, setError] = useState("");
+  const [selectedAirlines, setSelectedAirlines] = useState(['Southwest', 'Delta']);
+  const [searchPerformed, setSearchPerformed] = useState(false);
+
 
   useEffect(() => {
     axios.get("http://localhost:8080/api/locations?size=91")
       .then(response => {
         // I had to change this because the get call needs the IATA too or it won't work
-        //const locationNames = response.data.map(location => location.cityName);
         const locationNames = response.data.map(location => `${location.cityName} (${location.iataCode})`);
         setLocations(locationNames);
         setLoading(false);
@@ -25,6 +27,14 @@ const SearchFlightsPage = () => {
         console.error("Error fetching locations:", error);
         setLoading(false);
       });
+  }, []);
+
+  const handleAirlineChange = useCallback((event, airline) => {
+    setSelectedAirlines((prev) =>
+      event.target.checked
+        ? [...prev, airline]
+        : prev.filter((item) => item !== airline)
+    );
   }, []);
 
   // Handle searching flights
@@ -36,6 +46,8 @@ const SearchFlightsPage = () => {
     
     setLoading(true);
     setError("");
+    setSearchPerformed(true);
+    setSelectedAirlines(['Southwest', 'Delta']);
 
     console.log('GET Request:', 'http://localhost:8080/api/flights/search', {
       params: {
@@ -63,6 +75,21 @@ const SearchFlightsPage = () => {
         setLoading(false);
       });
   };
+
+  // Filter flights based on selected airlines
+  const filteredFlights = flights.filter((flight) => {
+    if (selectedAirlines.length === 0) {
+      return true;
+    }
+    const flightNumber = flight.flightNumber;
+    if (selectedAirlines.includes('Southwest') && flightNumber.startsWith('WN')) {
+      return true;
+    }
+    if (selectedAirlines.includes('Delta') && flightNumber.startsWith('DL')) {
+      return true;
+    }
+    return false;
+  });
 
   return (
     <>
@@ -97,7 +124,6 @@ const SearchFlightsPage = () => {
             )}
             sx={{ flex: 1 }}
             disableClearable
-            // disableFreeSolo
             disableCloseOnSelect
             disablePortal
             openOnFocus
@@ -126,7 +152,6 @@ const SearchFlightsPage = () => {
             )}
             sx={{ flex: 1 }}
             disableClearable
-            // disableFreeSolo
             disableCloseOnSelect
             disablePortal
             openOnFocus
@@ -148,15 +173,59 @@ const SearchFlightsPage = () => {
         ) : error ? (
           error && <Alert severity="error">{error}</Alert>
         ) : (
-          <Grid container spacing={3} sx={{ mt: 4 }}>
-            {flights.length > 0 ? (
-              flights.map((flight) => (
-                <Grid item xs={12} sm={6} md={4} key={flight.flightId}>
-                  <FlightCard flight={flight} />
-                </Grid>
-              ))
-            ) : (
-              <Typography>No flights found for the selected route.</Typography>
+          <Grid container spacing={3} sx={{ mt: 2 }}>
+            {searchPerformed && (
+              <>
+                {flights.length > 0 ? (
+                <>
+                  {/* Filters */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'column',
+                        mt: 0,
+                        width: '100%',
+                        position: 'relative',
+                      }}
+                    >
+                      <FormControl component="fieldset">
+                        <FormGroup row>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={selectedAirlines.includes('Southwest')}
+                                onChange={(e) => handleAirlineChange(e, 'Southwest')}
+                              />
+                            }
+                            label="Southwest"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={selectedAirlines.includes('Delta')}
+                                onChange={(e) => handleAirlineChange(e, 'Delta')}
+                              />
+                            }
+                            label="Delta"
+                          />
+                        </FormGroup>
+                      </FormControl>
+                    </Box>
+                  {/* Flight cards */}
+                  <Grid container item xs={12} spacing={3}>
+                    {filteredFlights.map((flight) => (
+                      <Grid item xs={12} sm={6} md={4} key={flight.flightId}>
+                        <FlightCard flight={flight} />
+                      </Grid>
+                    ))}
+                  </Grid>
+                </>
+              ) : (
+                <Typography>No flights found for the selected route.</Typography>
+              )}
+              </>
             )}
           </Grid>
         )}

@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/users/login';
+const API_URL = 'http://localhost:8080/api/auth/login';
 
 // Styled components
 const LoginPaper = styled(Paper)(({ theme }) => ({
@@ -50,13 +50,12 @@ const LoginPage = () => {
     }
 
     try {
-    const loginData = identifier.includes('@')
-      ? { email: identifier, password }
-      : { username: identifier, password };
+    const loginData = { identifier, password };
 
     const response = await axios.post(API_URL, loginData);
 
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
       navigate('/dashboard');
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to connect to the server. Please try again.');
