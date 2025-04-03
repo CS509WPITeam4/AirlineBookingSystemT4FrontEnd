@@ -3,6 +3,11 @@ import axios from 'axios';
 import { Container, Box, Autocomplete, TextField, Button, CircularProgress, Typography, Grid, Alert, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import DestinationGallery from '../components/DestinationGallery';
 import FlightCard from '../components/FlightCard';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
+
+
 
 const SearchFlightsPage = () => {
   const [locations, setLocations] = useState([]);
@@ -13,6 +18,8 @@ const SearchFlightsPage = () => {
   const [error, setError] = useState("");
   const [selectedAirlines, setSelectedAirlines] = useState(['Southwest', 'Delta']);
   const [searchPerformed, setSearchPerformed] = useState(false);
+  const [departureDate, setDepartureDate] = useState(null);
+
 
 
   useEffect(() => {
@@ -53,6 +60,7 @@ const SearchFlightsPage = () => {
       params: {
         departAirport: origin,
         arriveAirport: destination,
+        departureDate: departureDate ? departureDate.toISOString().split('T')[0] : null,
       }
     });
 
@@ -157,6 +165,17 @@ const SearchFlightsPage = () => {
             openOnFocus
             disabled={loading}
           />
+          
+          <DatePicker
+            selected={departureDate}
+            onChange={(date) => setDepartureDate(date)}
+            placeholderText="Departure Date"
+            dateFormat="yyyy-MM-dd"
+            customInput={<TextField label="Departure Date" variant="outlined" fullWidth />}
+            isClearable
+          />
+
+
           <Button
             variant="contained"
             color="primary"
