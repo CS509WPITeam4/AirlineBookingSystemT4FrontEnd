@@ -7,6 +7,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import FlightDetailsPage from './pages/FlightDetailsPage';
 import SearchFlightsPage from "./pages/SearchFlightsPage.jsx";
+import Bookings from './pages/Bookings.jsx';
 import './App.css';
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         
         {/* Protected pages */}
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/bookings" element={<Bookings />} />
         
         {/* Default route - redirect to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />

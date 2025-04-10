@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Container, 
-  Typography, 
-  Box, 
-  Grid, 
-  Paper, 
+import {
+  Container,
+  Typography,
+  Box,
+  Grid,
+  Paper,
   Button,
   Divider,
   List,
@@ -17,7 +17,6 @@ import {
   Tabs
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import FlightIcon from '@mui/icons-material/Flight';
 import PersonIcon from '@mui/icons-material/Person';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
@@ -32,19 +31,19 @@ const DashboardPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error] = useState('');
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
     // Check if user is logged in
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    
+
     if (!token || !userData) {
       navigate('/login');
       return;
     }
-    
+
     setUser(JSON.parse(userData));
     setIsLoading(false);
   }, [navigate]);
@@ -84,10 +83,10 @@ const DashboardPage = () => {
           <Grid item xs={12} md={4}>
             <StyledPaper>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
-                <Avatar 
-                  sx={{ 
-                    width: 80, 
-                    height: 80, 
+                <Avatar
+                  sx={{
+                    width: 80,
+                    height: 80,
                     bgcolor: 'primary.main',
                     mb: 2
                   }}
@@ -101,16 +100,16 @@ const DashboardPage = () => {
                   {user.email || 'user@example.com'}
                 </Typography>
               </Box>
-              
+
               <Divider sx={{ my: 2 }} />
-              
+
               <List>
                 <ListItem>
                   <ListItemIcon>
                     <PersonIcon />
                   </ListItemIcon>
-                  <ListItemText 
-                    primary="Account Details" 
+                  <ListItemText
+                    primary="Account Details"
                     secondary="Manage your personal information"
                   />
                 </ListItem>
@@ -118,17 +117,29 @@ const DashboardPage = () => {
                   <ListItemIcon>
                     <CalendarTodayIcon />
                   </ListItemIcon>
-                  <ListItemText 
-                    primary="Travel History" 
+                  <ListItemText
+                    primary="Travel History"
                     secondary="View your trips"
                   />
                 </ListItem>
               </List>
-              
+
+              <ListItem
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => navigate('/bookings')}
+              >
+                <ListItemIcon>
+                </ListItemIcon>
+                <ListItemText
+                    primary="My Bookings"
+                    secondary="View your flight bookings"
+                />
+              </ListItem>
+
               <Box sx={{ mt: 3 }}>
-                <Button 
-                  variant="contained" 
-                  fullWidth 
+                <Button
+                  variant="contained"
+                  fullWidth
                   onClick={handleBookFlight}
                   sx={{ py: 1.5 }}
                 >
@@ -137,13 +148,13 @@ const DashboardPage = () => {
               </Box>
             </StyledPaper>
           </Grid>
-          
+
           {/* Bookings Section */}
           <Grid item xs={12} md={8}>
             <StyledPaper>
               <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-                <Tabs 
-                  value={tabValue} 
+                <Tabs
+                  value={tabValue}
                   onChange={handleTabChange}
                   variant="fullWidth"
                 >
@@ -151,13 +162,13 @@ const DashboardPage = () => {
                   <Tab label="Past Trips" />
                 </Tabs>
               </Box>
-              
+
               {error && (
                 <Typography color="error" sx={{ mt: 2, mb: 2 }}>
                   {error}
                 </Typography>
               )}
-              
+
               {isLoading ? (
                 <Typography>Loading your bookings...</Typography>
               ) : (
@@ -167,13 +178,13 @@ const DashboardPage = () => {
                       <Typography variant="h6" sx={{ mb: 2 }}>
                         Your Upcoming Trips
                       </Typography>
-                      
+
                       <Box sx={{ textAlign: 'center', py: 4 }}>
                         <Typography variant="body1" sx={{ mb: 2 }}>
-                          You don't have any upcoming trips.
+                          You don&#39;t have any upcoming trips.
                         </Typography>
-                        <Button 
-                          variant="contained" 
+                        <Button
+                          variant="contained"
                           onClick={handleBookFlight}
                         >
                           Book a Flight
@@ -181,13 +192,13 @@ const DashboardPage = () => {
                       </Box>
                     </>
                   )}
-                  
+
                   {tabValue === 1 && (
                     <>
                       <Typography variant="h6" sx={{ mb: 2 }}>
                         Your Past Trips
                       </Typography>
-                      
+
                       <Box sx={{ textAlign: 'center', py: 4 }}>
                         <Typography variant="body1">
                           No past trips to display.
