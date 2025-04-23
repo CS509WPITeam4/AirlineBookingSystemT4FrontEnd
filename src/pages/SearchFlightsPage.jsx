@@ -6,9 +6,6 @@ import FlightCard from '../components/FlightCard';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-
-
-
 const SearchFlightsPage = () => {
   const [locations, setLocations] = useState([]);
   const [origin, setOrigin] = useState(null);
@@ -20,12 +17,9 @@ const SearchFlightsPage = () => {
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [departureDate, setDepartureDate] = useState(null);
 
-
-
   useEffect(() => {
     axios.get("http://localhost:8080/api/locations?size=91")
       .then(response => {
-        // I had to change this because the get call needs the IATA too or it won't work
         const locationNames = response.data.map(location => `${location.cityName} (${location.iataCode})`);
         setLocations(locationNames);
         setLoading(false);
@@ -73,6 +67,7 @@ const SearchFlightsPage = () => {
         }
       })
       .then(response => {
+        console.log('Response data:', response.data);
         setFlights(response.data);
       })
       .catch(error => {
@@ -89,14 +84,38 @@ const SearchFlightsPage = () => {
     if (selectedAirlines.length === 0) {
       return true;
     }
-    const flightNumber = flight.flightNumber;
-    if (selectedAirlines.includes('Southwest') && flightNumber.startsWith('WN')) {
-      return true;
-    }
-    if (selectedAirlines.includes('Delta') && flightNumber.startsWith('DL')) {
-      return true;
-    }
-    return false;
+    return flight.flights.every((flight) => {
+      const flightNumber = flight.flightNumber;
+  
+      if (selectedAirlines.includes('Southwest') && flightNumber.startsWith('WN')) {
+        return true;
+      }
+  
+      if (selectedAirlines.includes('Delta') && flightNumber.startsWith('DL')) {
+        return true;
+      }
+  
+      return false;
+    });
+  });
+
+  // Get full duration of flight (counting layovers)
+  const getDuration = (flights) => {
+    if (!flights || flights.length === 0) return "";
+  
+    const depart = new Date(flights[0].departDateTime).getTime();
+    const arrive = new Date(flights[flights.length - 1].arriveDateTime).getTime();
+    const diffMs = arrive < depart ? arrive + 24 * 60 * 60 * 1000 - depart : arrive - depart;
+    const totalMinutes = Math.floor(diffMs / 1000 / 60);
+  
+    return totalMinutes;
+  };
+
+  // Sort flights from shortest to longest
+  const sortedFlights = filteredFlights.sort((flightCard1, flightCard2) => {
+    const totalTime1 = getDuration(flightCard1.flights);
+    const totalTime2 = getDuration(flightCard2.flights);
+    return totalTime1 - totalTime2;
   });
 
   return (
@@ -175,7 +194,6 @@ const SearchFlightsPage = () => {
             isClearable
           />
 
-
           <Button
             variant="contained"
             color="primary"
@@ -234,11 +252,17 @@ const SearchFlightsPage = () => {
                     </Box>
                   {/* Flight cards */}
                   <Grid container item xs={12} spacing={3}>
-                    {filteredFlights.map((flight) => (
-                      <Grid item xs={12} sm={6} md={4} key={flight.flightId}>
-                        <FlightCard flight={flight} />
-                      </Grid>
-                    ))}
+                    {sortedFlights.length > 0 ? (
+                      <>
+                        {sortedFlights.map((flightCardDTO, index) => (
+                          <Grid item xs={12} sm={6} md={4} key={index}>
+                            <FlightCard flightCardDTO={flightCardDTO} />
+                          </Grid>
+                        ))}
+                      </>
+                    ) : (
+                      <Typography>No flights found for the selected route.</Typography>
+                    )}
                   </Grid>
                 </>
               ) : (
