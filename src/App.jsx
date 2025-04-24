@@ -9,6 +9,7 @@ import FlightDetailsPage from './pages/FlightDetailsPage';
 import SearchFlightsPage from "./pages/SearchFlightsPage.jsx";
 import Bookings from './pages/Bookings.jsx';
 import './App.css';
+import './style.css';
 function App() {
   return (
     <BrowserRouter>
