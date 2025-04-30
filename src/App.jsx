@@ -20,7 +20,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         
         {/* Flight pages */}
-        <Route path="/flight/:flightId" element={<FlightDetailsPage />} />
+        <Route path="/book-flight" element={<FlightDetailsPage />} />
         <Route path="/search-flights" element={<SearchFlightsPage/>} />
         <Route path="/booking/:flightId" element={<Navigate to="/dashboard" replace />} />
         
