@@ -179,7 +179,10 @@ const FlightCard = ({ flightCardDTO }) => {
         <Button 
           fullWidth
           sx={{ mt: 0, mb: 0, p: 0 }}
-          onClick={() => navigate(`/flight/:flightId`)}
+          onClick={() => 
+            navigate(`/book-flight`, {
+            state: { flights: flightCardDTO.flights }
+          })}
         >
           View Details
         </Button>

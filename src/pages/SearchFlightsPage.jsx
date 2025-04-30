@@ -15,11 +15,11 @@ const SearchFlightsPage = () => {
   const [returnFlights, setReturnFlights] = useState([]);
   const [error, setError] = useState("");
   const [selectedAirlines, setSelectedAirlines] = useState(['Southwest', 'Delta']);
+  const [sortType, setSortType] = useState('Total Time');
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [departureDate, setDepartureDate] = useState(null);
   const [returnDate, setReturnDate] = useState(null);
   const [roundTrip, setRoundTrip] = useState(false);
-  const [passengerCount, setPassengerCount] = useState(1);
   const [maxStops, setMaxStops] = useState(5);
   const [maxLayover, setMaxLayover] = useState(300);
   const [selectedTab, setSelectedTab] = useState('departures');
@@ -164,10 +164,20 @@ const SearchFlightsPage = () => {
   });
 
   // Sort departing flights from shortest to longest
-  const sortedFlights = filteredFlights.sort((flightCard1, flightCard2) => {
-    const totalTime1 = getDuration(flightCard1.flights);
-    const totalTime2 = getDuration(flightCard2.flights);
-    return totalTime1 - totalTime2;
+  // const sortedFlights = filteredFlights.sort((flightCard1, flightCard2) => {
+  const sortedFlights = [...filteredFlights].sort((flightCard1, flightCard2) => {
+    if(sortType === 'Total Time') {
+      const totalTime1 = getDuration(flightCard1.flights);
+      const totalTime2 = getDuration(flightCard2.flights);
+      return totalTime1 - totalTime2;
+    } else if (sortType === 'Depart Time') {
+      const departTime1 = new Date(flightCard1.flights[0].departDateTime);
+      const departTime2 = new Date(flightCard2.flights[0].departDateTime);
+      return departTime1 - departTime2;
+    }
+    const arriveTime1 = new Date(flightCard1.flights[0].arriveDateTime);
+    const arriveTime2 = new Date(flightCard2.flights[0].arriveDateTime);
+    return arriveTime1 - arriveTime2;
   });
 
   // Sort returning flights from shortest to longest
@@ -195,6 +205,7 @@ const SearchFlightsPage = () => {
   ];
 
   const airlineOptions = ['Delta', 'Southwest'];
+  const sortOptions = ['Total Time', 'Depart Time', 'Arrive Time'];
 
   return (
     <>
@@ -312,19 +323,26 @@ const SearchFlightsPage = () => {
             <ToggleButton value="roundtrip" sx={{ minWidth: 90 }}>Round Trip</ToggleButton>
           </ToggleButtonGroup>
 
-          {/* Tickets */}
-          <TextField
-            label="Tickets"
-            type="number"
+          {/* Sort */}
+          <FormControl
             size="small"
-            value={passengerCount}
-            onChange={(e) => {
-              const value = parseInt(e.target.value, 10);
-              setPassengerCount(isNaN(value) || value < 1 ? 1 : value);
-            }}
-            inputProps={{ min: 1 }}
-            sx={{ width: 100 }}
-          />
+            sx={{ width: 160 }}
+          >
+            <InputLabel>Sort By</InputLabel>
+            <Select
+              labelId="airlines-label"
+              label="Sort By"
+              value={sortType}
+              onChange={(e) => setSortType(e.target.value)}
+              renderValue={(selected) => (selected)}
+            >
+              {sortOptions.map((sort) => (
+                <MenuItem key={sort} value={sort}>
+                  <ListItemText primary={sort} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           {/* Max Stops */}
           <TextField
