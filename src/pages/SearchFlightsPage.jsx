@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Container, Box, Autocomplete, TextField, Button, CircularProgress, Typography, Grid, Alert, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox, ToggleButton, ToggleButtonGroup, InputLabel, Select, MenuItem, ListItemText, Tab, Tabs } from '@mui/material';
 import DestinationGallery from '../components/DestinationGallery';
+import RoundTripFlightsCart from "../components/RoundTripFlightsCart.jsx";
 import FlightCard from '../components/FlightCard';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -23,6 +24,8 @@ const SearchFlightsPage = () => {
   const [maxStops, setMaxStops] = useState(5);
   const [maxLayover, setMaxLayover] = useState(300);
   const [selectedTab, setSelectedTab] = useState('departures');
+  const [selectedOriginFlight, setSelectedOriginFlight] = useState(null);
+  const [selectedReturnFlight, setSelectedReturnFlight] = useState(null);
 
   useEffect(() => {
     axios.get("http://localhost:8080/api/locations?size=91")
@@ -397,6 +400,16 @@ const SearchFlightsPage = () => {
 
         </Box>
 
+        {/* Round Trip Flights Cart (always show when roundTrip) */}
+        {roundTrip && (
+          <Box sx={{ mb: 3 }}>
+            <RoundTripFlightsCart
+                originFlight={selectedOriginFlight}
+                returnFlight={selectedReturnFlight}
+            />
+          </Box>
+        )}
+
         {loading ? (
           <CircularProgress />
         ) : error ? (
@@ -428,7 +441,7 @@ const SearchFlightsPage = () => {
                         sortedFlights.length > 0 ? (
                           sortedFlights.map((flightCardDTO, index) => (
                             <Grid item xs={12} sm={6} md={4} key={index}>
-                              <FlightCard flightCardDTO={flightCardDTO} />
+                              <FlightCard flightCardDTO={flightCardDTO} direction={roundTrip ? 'origin' : undefined} onSelectFlight={setSelectedOriginFlight} />
                             </Grid>
                           ))
                         ) : (
@@ -438,7 +451,7 @@ const SearchFlightsPage = () => {
                         sortedReturnFlights.length > 0 ? (
                           sortedReturnFlights.map((flightCardDTO, index) => (
                             <Grid item xs={12} sm={6} md={4} key={index}>
-                              <FlightCard flightCardDTO={flightCardDTO} />
+                              <FlightCard flightCardDTO={flightCardDTO} direction="return" onSelectFlight={setSelectedReturnFlight} />
                             </Grid>
                           ))
                         ) : (

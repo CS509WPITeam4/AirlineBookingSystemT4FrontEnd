@@ -66,13 +66,25 @@ const getDuration = (flights) => {
 };
 
 // Flight card object
-const FlightCard = ({ flightCardDTO }) => {
+const FlightCard = ({ flightCardDTO, direction, onSelectFlight}) => {
   const { flights } = flightCardDTO;
   const navigate = useNavigate();
   const [selected, setSelected] = useState(false);
 
   const handleSelect = () => {
     setSelected(!selected);
+  };
+
+  const handleButtonClick = () => {
+    if (direction === 'origin' && onSelectFlight) {
+      onSelectFlight(flightCardDTO.flights);
+    } else if (direction === 'return' && onSelectFlight) {
+      onSelectFlight(flightCardDTO.flights);
+    } else if (!direction) {
+      navigate(`/book-flight`, {
+        state: { flights: flightCardDTO.flights }
+      });
+    }
   };
 
   // Shows the correct logo
@@ -175,16 +187,17 @@ const FlightCard = ({ flightCardDTO }) => {
         </Box>
         <Divider sx={{ my: 1 }} />
 
-        {/* View Details Link */}
-        <Button 
+        {/* Book/Add Flight Button */}
+        <Button
           fullWidth
           sx={{ mt: 0, mb: 0, p: 0 }}
-          onClick={() => 
-            navigate(`/book-flight`, {
-            state: { flights: flightCardDTO.flights }
-          })}
+          onClick={handleButtonClick}
         >
-          View Details
+          {direction === 'origin'
+            ? 'Add Origin Flight'
+            : direction === 'return'
+            ? 'Add Return Flight'
+            : 'Book Flight'}
         </Button>
       </CardContent>
     </StyledCard>
