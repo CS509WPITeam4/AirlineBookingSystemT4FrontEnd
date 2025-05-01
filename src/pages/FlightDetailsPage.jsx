@@ -64,18 +64,24 @@ const FlightDetailsPage = () => {
   });
 
   useEffect(() => {
-    // Check if user is logged in
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
       return;
     }
-    
-    // Simulate API call to fetch flight details
-    setIsLoading(true);
-    
-    // Mock data - in a real app, this would be an API call using the flightId
-    setTimeout(() => {
+  
+    const loadFlightDetails = async () => {
+      setIsLoading(true);
+  
+      // Simulate API delay
+      await new Promise((resolve) => {
+        if (process.env.NODE_ENV === 'test') {
+          resolve(); // Skip delay during tests
+        } else {
+          setTimeout(resolve, 500); // Simulated delay in dev
+        }
+      });
+  
       const mockFlightDetails = {
         id: flightId || 'FL123',
         airline: 'WPI Airways',
@@ -103,11 +109,14 @@ const FlightDetailsPage = () => {
           checked: 'First checked bag: $30, Second: $40'
         }
       };
-
+  
       setFlightDetails(mockFlightDetails);
       setIsLoading(false);
-    }, 500); // Load quickly for better UX
+    };
+  
+    loadFlightDetails();
   }, [flightId, navigate]);
+  
 
   const handleBack = () => {
     if (activeStep === 0) {
