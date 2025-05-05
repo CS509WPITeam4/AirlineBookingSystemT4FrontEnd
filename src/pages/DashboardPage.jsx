@@ -143,29 +143,8 @@ useEffect(() => {
 
               <Divider sx={{ my: 2 }} />
 
-              <List>
-                <ListItem>
-                  <ListItemIcon>
-                    <PersonIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Account Details"
-                    secondary="Manage your personal information"
-                  />
-                </ListItem>
-              </List>
+              {/* Removed Account Details ListItem */}
 
-              <ListItem
-                  sx={{ cursor: 'pointer' }}
-                  onClick={() => navigate('/bookings')}
-              >
-                <ListItemIcon>
-                </ListItemIcon>
-                <ListItemText
-                    primary="My Bookings"
-                    secondary="View your flight bookings"
-                />
-              </ListItem>
 
               <Box sx={{ mt: 3 }}>
                 <Button
@@ -229,15 +208,6 @@ useEffect(() => {
                                   <Typography variant="body2">Departure: {format(new Date(flight.departDateTime), 'PPpp')}</Typography>
                                   <Typography variant="body2">Arrival: {format(new Date(flight.arriveDateTime), 'PPpp')}</Typography>
                                 </Grid>
-                                <Grid item>
-                                  <Button
-                                    variant="outlined"
-                                    size="small"
-                                    onClick={() => navigate(`/modify-flight/${flight.id}`)}
-                                  >
-                                    Modify Flight
-                                  </Button>
-                                </Grid>
                               </Grid>
                             </Box>
                           ))
@@ -267,15 +237,6 @@ useEffect(() => {
                                   <Typography variant="body2">From: {flight.departAirport} To: {flight.arriveAirport}</Typography>
                                   <Typography variant="body2">Departure: {format(new Date(flight.departDateTime), 'PPpp')}</Typography>
                                   <Typography variant="body2">Arrival: {format(new Date(flight.arriveDateTime), 'PPpp')}</Typography>
-                                </Grid>
-                                <Grid item>
-                                  <Button
-                                    variant="outlined"
-                                    size="small"
-                                    onClick={() => navigate(`/modify-flight/${flight.id}`)}
-                                  >
-                                    Modify Flight
-                                  </Button>
                                 </Grid>
                               </Grid>
                             </Box>
