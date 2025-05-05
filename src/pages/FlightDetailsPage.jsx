@@ -52,19 +52,60 @@ const FlightDetailsPage = () => {
 
 
   useEffect(() => {
-    // Check if user is logged in
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
       return;
     }
-
-    // Load page
-    setIsLoading(true);
-    setTimeout(() => {
+  
+    const loadFlightDetails = async () => {
+      setIsLoading(true);
+  
+      // Simulate API delay
+      await new Promise((resolve) => {
+        if (process.env.NODE_ENV === 'test') {
+          resolve(); // Skip delay during tests
+        } else {
+          setTimeout(resolve, 500); // Simulated delay in dev
+        }
+      });
+  
+      const mockFlightDetails = {
+        id: flightId || 'FL123',
+        airline: 'WPI Airways',
+        flightNumber: 'WPI256',
+        departureAirport: {
+          code: 'BOS',
+          name: 'Boston Logan International',
+          terminal: 'B',
+          gate: '25'
+        },
+        arrivalAirport: {
+          code: 'JFK',
+          name: 'New York John F. Kennedy',
+          terminal: 'T4',
+          gate: '12'
+        },
+        departureTime: '2023-12-15T08:30:00',
+        arrivalTime: '2023-12-15T10:15:00',
+        duration: '1h 45m',
+        seatsAvailable: 8,
+        totalSeats: 180,
+        price: 109.99,
+        baggage: {
+          carryOn: 'One personal item + one carry-on bag (max 10kg)',
+          checked: 'First checked bag: $30, Second: $40'
+        }
+      };
+  
+      setFlightDetails(mockFlightDetails);
       setIsLoading(false);
-    }, 100);
+    };
+  
+    loadFlightDetails();
+
   }, [flightId, navigate]);
+  
 
   const handleBack = () => {
     if (activeStep === 0) {
