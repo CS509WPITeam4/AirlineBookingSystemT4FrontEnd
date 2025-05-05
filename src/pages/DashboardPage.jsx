@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Container, 
-  Typography, 
-  Box, 
-  Grid, 
-  Paper, 
+import {
+  Container,
+  Typography,
+  Box,
+  Grid,
+  Paper,
   Button,
   Divider,
   List,
@@ -17,7 +17,6 @@ import {
   Tabs
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import FlightIcon from '@mui/icons-material/Flight';
 import PersonIcon from '@mui/icons-material/Person';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
@@ -32,6 +31,7 @@ const DashboardPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
   const [bookings, setBookings] = useState([]);
   const [error, setError] = useState('');
   const [tabValue, setTabValue] = useState(0);
@@ -39,11 +39,12 @@ const DashboardPage = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    
+
     if (!token || !userData) {
       navigate('/login');
       return;
     }
+
 
     const parsedUser = JSON.parse(userData);
     const userId = parsedUser.id;
@@ -69,6 +70,7 @@ const DashboardPage = () => {
     };
 
     fetchBookings();
+
   }, [navigate]);
 
   const handleLogout = () => {
@@ -104,7 +106,18 @@ const DashboardPage = () => {
           <Grid item xs={12} md={4}>
             <StyledPaper>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
-                <Avatar sx={{ width: 80, height: 80, bgcolor: 'primary.main', mb: 2 }}>
+
+                
+
+                <Avatar
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    bgcolor: 'primary.main',
+                    mb: 2
+                  }}
+                >
+
                   <PersonIcon fontSize="large" />
                 </Avatar>
                 <Typography variant="h5">{user.firstName} {user.lastName}</Typography>
@@ -115,32 +128,59 @@ const DashboardPage = () => {
 
               <List>
                 <ListItem>
-                  <ListItemIcon><PersonIcon /></ListItemIcon>
-                  <ListItemText primary="Account Details" secondary="Manage your personal information" />
+                  <ListItemIcon>
+                    <PersonIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Account Details"
+                    secondary="Manage your personal information"
+                  />
                 </ListItem>
                 <ListItem>
-                  <ListItemIcon><CalendarTodayIcon /></ListItemIcon>
-                  <ListItemText primary="Travel History" secondary="View your trips" />
-                </ListItem>
-                <ListItem sx={{ cursor: 'pointer' }} onClick={() => navigate('/bookings')}>
-                  <ListItemIcon />
-                  <ListItemText primary="My Bookings" secondary="View your flight bookings" />
+                  <ListItemIcon>
+                    <CalendarTodayIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Travel History"
+                    secondary="View your trips"
+                  />
                 </ListItem>
               </List>
 
+              <ListItem
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => navigate('/bookings')}
+              >
+                <ListItemIcon>
+                </ListItemIcon>
+                <ListItemText
+                    primary="My Bookings"
+                    secondary="View your flight bookings"
+                />
+              </ListItem>
+
               <Box sx={{ mt: 3 }}>
-                <Button variant="contained" fullWidth onClick={handleBookFlight} sx={{ py: 1.5 }}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={handleBookFlight}
+                  sx={{ py: 1.5 }}
+                >
                   Book a New Flight
                 </Button>
               </Box>
             </StyledPaper>
           </Grid>
 
-          {/* Right: Trip Tabs */}
+          {/* Bookings Section */}
           <Grid item xs={12} md={8}>
             <StyledPaper>
               <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-                <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth">
+                <Tabs
+                  value={tabValue}
+                  onChange={handleTabChange}
+                  variant="fullWidth"
+                >
                   <Tab label="Upcoming Trips" />
                   <Tab label="Past Trips" />
                 </Tabs>
@@ -156,42 +196,37 @@ const DashboardPage = () => {
                 <>
                   {tabValue === 0 && (
                     <>
-                      <Typography variant="h6" sx={{ mb: 2 }}>Your Upcoming Trips</Typography>
-                      {upcoming.length > 0 ? (
-                        upcoming.map((b, idx) => (
-                          <Box key={idx} sx={{ mb: 2 }}>
-                            <Typography variant="body1">
-                              Booking #{b.bookingId} — {b.flights[0]?.departDateTime}
-                            </Typography>
-                          </Box>
-                        ))
-                      ) : (
-                        <Box sx={{ textAlign: 'center', py: 4 }}>
-                          <Typography>You don't have any upcoming trips.</Typography>
-                          <Button variant="contained" onClick={handleBookFlight} sx={{ mt: 2 }}>
-                            Book a Flight
-                          </Button>
-                        </Box>
-                      )}
+
+
+                      <Typography variant="h6" sx={{ mb: 2 }}>
+                        Your Upcoming Trips
+                      </Typography>
+
+                      <Box sx={{ textAlign: 'center', py: 4 }}>
+                        <Typography variant="body1" sx={{ mb: 2 }}>
+                          You don&#39;t have any upcoming trips.
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          onClick={handleBookFlight}
+                        >
+                          Book a Flight
+                        </Button>
+                      </Box>
                     </>
                   )}
 
                   {tabValue === 1 && (
                     <>
-                      <Typography variant="h6" sx={{ mb: 2 }}>Your Past Trips</Typography>
-                      {past.length > 0 ? (
-                        past.map((b, idx) => (
-                          <Box key={idx} sx={{ mb: 2 }}>
-                            <Typography variant="body1">
-                              Booking #{b.bookingId} — {b.flights[0]?.departDateTime}
-                            </Typography>
-                          </Box>
-                        ))
-                      ) : (
-                        <Box sx={{ textAlign: 'center', py: 4 }}>
-                          <Typography>No past trips to display.</Typography>
-                        </Box>
-                      )}
+                      <Typography variant="h6" sx={{ mb: 2 }}>
+                        Your Past Trips
+                      </Typography>
+
+                      <Box sx={{ textAlign: 'center', py: 4 }}>
+                        <Typography variant="body1">
+                          No past trips to display.
+                        </Typography>
+                      </Box>
                     </>
                   )}
                 </>
