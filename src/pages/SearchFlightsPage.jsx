@@ -54,12 +54,6 @@ const SearchFlightsPage = () => {
       setError("Please select both origin and destination.");
       return;
     }
-
-
-    if (roundTrip && (!returnDate && departureDate || returnDate && !departureDate)) {
-      alert('Please select a departure and return date or leave both blank');
-      return;
-    }
     
     setLoading(true);
     setError("");
@@ -427,7 +421,7 @@ const SearchFlightsPage = () => {
                 {flights.length > 0 || returnFlights.length > 0 ? (
                   <>
                     {/* Tabs (if return flight exists) */}
-                    {roundTrip && (
+                    {returnFlights.length > 0 && (
                       <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                         <Tabs
                           value={selectedTab}

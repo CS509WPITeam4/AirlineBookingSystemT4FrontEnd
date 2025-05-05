@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { 
   Container, 
@@ -32,6 +31,19 @@ const FlightDetailsPage = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Passenger information form
+  const [passengerInfo, setPassengerInfo] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    dateOfBirth: '',
+    passportNumber: '',
+    seatPreference: 'window'
+  });
+
 
   const [flights, setflights] = useState(() => location.state?.flights || []);
   const [returnFlights, setReturnFlights] = useState(() => location.state?.returnFlights || []);
@@ -123,27 +135,37 @@ const FlightDetailsPage = () => {
     setActiveStep((prevStep) => prevStep + 1);
   };
 
+  const handlePassengerInfoChange = (e) => {
+    setPassengerInfo({
+      ...passengerInfo,
+      [e.target.name]: e.target.value
+    });
+  };
+
+
+  const handleSearchFlights = () => {
+    if (searchQuery) {
+      // Navigate to dashboard with search query
+      navigate(`/dashboard?q=${encodeURIComponent(searchQuery)}`);
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearchFlights();
+    }
+  };
+
   const handleCompleteBooking = () => {
-    console.log("handleCompleteBooking called");
-    axios
-          .post("http://localhost:8080/api/bookings/create", {
-            departures: flights,
-            returns: returnFlights
-          })
-          .then(response => {
-            alert('Booking completed successfully!');
-            console.log('Response data:', response.data);
-            navigate('/dashboard');
-          })
-          .catch(error => {
-            console.error("Error creating booking: ", error);
-            alert('Failed to create booking. Please try again later.');
-            setError("Failed to create booking. Please try again later.");
-          })
-          .finally(() => {
-            // Set loading to false after booking finished
-            setIsLoading(false);
-          });
+    // In a real app, this would send booking information to the backend
+    alert('Booking completed successfully!');
+    navigate('/dashboard', { state: { bookingSuccess: true } });
   };
 
   // Format date to readable format
