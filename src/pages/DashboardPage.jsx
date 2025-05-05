@@ -31,11 +31,12 @@ const DashboardPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error] = useState('');
+
+  const [bookings, setBookings] = useState([]);
+  const [error, setError] = useState('');
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
-    // Check if user is logged in
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 
@@ -44,8 +45,32 @@ const DashboardPage = () => {
       return;
     }
 
-    setUser(JSON.parse(userData));
-    setIsLoading(false);
+
+    const parsedUser = JSON.parse(userData);
+    const userId = parsedUser.id;
+    setUser(parsedUser);
+
+    const fetchBookings = async () => {
+      try {
+        const res = await fetch(`/api/bookings?userId=${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch bookings');
+        const data = await res.json();
+        setBookings(data);
+      } catch (err) {
+        console.error(err);
+        setError('Could not load bookings.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBookings();
+
   }, [navigate]);
 
   const handleLogout = () => {
@@ -62,27 +87,28 @@ const DashboardPage = () => {
     setTabValue(newValue);
   };
 
-  if (!user) {
-    return null; // Will redirect to login in useEffect
-  }
+  const currentDate = new Date();
+  const upcoming = bookings.filter(b => new Date(b.flights[0]?.departDateTime) > currentDate);
+  const past = bookings.filter(b => new Date(b.flights[0]?.departDateTime) <= currentDate);
+
+  if (!user) return null;
 
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography component="h1" variant="h4" color="primary">
-            My Dashboard
-          </Typography>
-          <Button variant="outlined" onClick={handleLogout}>
-            Logout
-          </Button>
+          <Typography component="h1" variant="h4" color="primary">My Dashboard</Typography>
+          <Button variant="outlined" onClick={handleLogout}>Logout</Button>
         </Box>
 
         <Grid container spacing={3}>
-          {/* User Profile Section */}
+          {/* Left: Profile and navigation */}
           <Grid item xs={12} md={4}>
             <StyledPaper>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
+
+                
+
                 <Avatar
                   sx={{
                     width: 80,
@@ -91,6 +117,7 @@ const DashboardPage = () => {
                     mb: 2
                   }}
                 >
+
                   <PersonIcon fontSize="large" />
                 </Avatar>
                 <Typography variant="h5">
@@ -173,9 +200,7 @@ const DashboardPage = () => {
               </Box>
 
               {error && (
-                <Typography color="error" sx={{ mt: 2, mb: 2 }}>
-                  {error}
-                </Typography>
+                <Typography color="error" sx={{ mt: 2, mb: 2 }}>{error}</Typography>
               )}
 
               {isLoading ? (
@@ -184,6 +209,8 @@ const DashboardPage = () => {
                 <>
                   {tabValue === 0 && (
                     <>
+
+
                       <Typography variant="h6" sx={{ mb: 2 }}>
                         Your Upcoming Trips
                       </Typography>
