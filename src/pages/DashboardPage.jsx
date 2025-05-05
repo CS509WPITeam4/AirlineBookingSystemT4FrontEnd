@@ -32,11 +32,11 @@ const DashboardPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [bookings, setBookings] = useState([]);
   const [error, setError] = useState('');
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
-    // Check if user is logged in
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
     
@@ -44,9 +44,31 @@ const DashboardPage = () => {
       navigate('/login');
       return;
     }
-    
-    setUser(JSON.parse(userData));
-    setIsLoading(false);
+
+    const parsedUser = JSON.parse(userData);
+    const userId = parsedUser.id;
+    setUser(parsedUser);
+
+    const fetchBookings = async () => {
+      try {
+        const res = await fetch(`/api/bookings?userId=${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch bookings');
+        const data = await res.json();
+        setBookings(data);
+      } catch (err) {
+        console.error(err);
+        setError('Could not load bookings.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBookings();
   }, [navigate]);
 
   const handleLogout = () => {
@@ -63,136 +85,113 @@ const DashboardPage = () => {
     setTabValue(newValue);
   };
 
-  if (!user) {
-    return null; // Will redirect to login in useEffect
-  }
+  const currentDate = new Date();
+  const upcoming = bookings.filter(b => new Date(b.flights[0]?.departDateTime) > currentDate);
+  const past = bookings.filter(b => new Date(b.flights[0]?.departDateTime) <= currentDate);
+
+  if (!user) return null;
 
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography component="h1" variant="h4" color="primary">
-            My Dashboard
-          </Typography>
-          <Button variant="outlined" onClick={handleLogout}>
-            Logout
-          </Button>
+          <Typography component="h1" variant="h4" color="primary">My Dashboard</Typography>
+          <Button variant="outlined" onClick={handleLogout}>Logout</Button>
         </Box>
 
         <Grid container spacing={3}>
-          {/* User Profile Section */}
+          {/* Left: Profile and navigation */}
           <Grid item xs={12} md={4}>
             <StyledPaper>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
-                <Avatar 
-                  sx={{ 
-                    width: 80, 
-                    height: 80, 
-                    bgcolor: 'primary.main',
-                    mb: 2
-                  }}
-                >
+                <Avatar sx={{ width: 80, height: 80, bgcolor: 'primary.main', mb: 2 }}>
                   <PersonIcon fontSize="large" />
                 </Avatar>
-                <Typography variant="h5">
-                  {user.firstName || 'John'} {user.lastName || 'Doe'}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {user.email || 'user@example.com'}
-                </Typography>
+                <Typography variant="h5">{user.firstName} {user.lastName}</Typography>
+                <Typography variant="body2" color="text.secondary">{user.email}</Typography>
               </Box>
-              
+
               <Divider sx={{ my: 2 }} />
-              
+
               <List>
                 <ListItem>
-                  <ListItemIcon>
-                    <PersonIcon />
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary="Account Details" 
-                    secondary="Manage your personal information"
-                  />
+                  <ListItemIcon><PersonIcon /></ListItemIcon>
+                  <ListItemText primary="Account Details" secondary="Manage your personal information" />
                 </ListItem>
                 <ListItem>
-                  <ListItemIcon>
-                    <CalendarTodayIcon />
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary="Travel History" 
-                    secondary="View your trips"
-                  />
+                  <ListItemIcon><CalendarTodayIcon /></ListItemIcon>
+                  <ListItemText primary="Travel History" secondary="View your trips" />
+                </ListItem>
+                <ListItem sx={{ cursor: 'pointer' }} onClick={() => navigate('/bookings')}>
+                  <ListItemIcon />
+                  <ListItemText primary="My Bookings" secondary="View your flight bookings" />
                 </ListItem>
               </List>
-              
+
               <Box sx={{ mt: 3 }}>
-                <Button 
-                  variant="contained" 
-                  fullWidth 
-                  onClick={handleBookFlight}
-                  sx={{ py: 1.5 }}
-                >
+                <Button variant="contained" fullWidth onClick={handleBookFlight} sx={{ py: 1.5 }}>
                   Book a New Flight
                 </Button>
               </Box>
             </StyledPaper>
           </Grid>
-          
-          {/* Bookings Section */}
+
+          {/* Right: Trip Tabs */}
           <Grid item xs={12} md={8}>
             <StyledPaper>
               <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-                <Tabs 
-                  value={tabValue} 
-                  onChange={handleTabChange}
-                  variant="fullWidth"
-                >
+                <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth">
                   <Tab label="Upcoming Trips" />
                   <Tab label="Past Trips" />
                 </Tabs>
               </Box>
-              
+
               {error && (
-                <Typography color="error" sx={{ mt: 2, mb: 2 }}>
-                  {error}
-                </Typography>
+                <Typography color="error" sx={{ mt: 2, mb: 2 }}>{error}</Typography>
               )}
-              
+
               {isLoading ? (
                 <Typography>Loading your bookings...</Typography>
               ) : (
                 <>
                   {tabValue === 0 && (
                     <>
-                      <Typography variant="h6" sx={{ mb: 2 }}>
-                        Your Upcoming Trips
-                      </Typography>
-                      
-                      <Box sx={{ textAlign: 'center', py: 4 }}>
-                        <Typography variant="body1" sx={{ mb: 2 }}>
-                          You don't have any upcoming trips.
-                        </Typography>
-                        <Button 
-                          variant="contained" 
-                          onClick={handleBookFlight}
-                        >
-                          Book a Flight
-                        </Button>
-                      </Box>
+                      <Typography variant="h6" sx={{ mb: 2 }}>Your Upcoming Trips</Typography>
+                      {upcoming.length > 0 ? (
+                        upcoming.map((b, idx) => (
+                          <Box key={idx} sx={{ mb: 2 }}>
+                            <Typography variant="body1">
+                              Booking #{b.bookingId} — {b.flights[0]?.departDateTime}
+                            </Typography>
+                          </Box>
+                        ))
+                      ) : (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                          <Typography>You don't have any upcoming trips.</Typography>
+                          <Button variant="contained" onClick={handleBookFlight} sx={{ mt: 2 }}>
+                            Book a Flight
+                          </Button>
+                        </Box>
+                      )}
                     </>
                   )}
-                  
+
                   {tabValue === 1 && (
                     <>
-                      <Typography variant="h6" sx={{ mb: 2 }}>
-                        Your Past Trips
-                      </Typography>
-                      
-                      <Box sx={{ textAlign: 'center', py: 4 }}>
-                        <Typography variant="body1">
-                          No past trips to display.
-                        </Typography>
-                      </Box>
+                      <Typography variant="h6" sx={{ mb: 2 }}>Your Past Trips</Typography>
+                      {past.length > 0 ? (
+                        past.map((b, idx) => (
+                          <Box key={idx} sx={{ mb: 2 }}>
+                            <Typography variant="body1">
+                              Booking #{b.bookingId} — {b.flights[0]?.departDateTime}
+                            </Typography>
+                          </Box>
+                        ))
+                      ) : (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                          <Typography>No past trips to display.</Typography>
+                        </Box>
+                      )}
                     </>
                   )}
                 </>
