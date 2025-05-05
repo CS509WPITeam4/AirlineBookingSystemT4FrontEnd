@@ -66,7 +66,7 @@ const getDuration = (flights) => {
 };
 
 // Flight card object
-const FlightCard = ({ flightCardDTO, direction, onSelectFlight}) => {
+const FlightCard = ({ flightCardDTO, direction, onSelectFlight, context }) => {
   const { flights } = flightCardDTO;
   const navigate = useNavigate();
   const [selected, setSelected] = useState(false);
@@ -97,6 +97,10 @@ const FlightCard = ({ flightCardDTO, direction, onSelectFlight}) => {
     { delta: false, southwest: false }
   );
 
+  try {
+    if (!flightCardDTO || !flightCardDTO.flights || flightCardDTO.flights.length === 0) {
+      throw new Error("Invalid flightCardDTO data");
+    }
   return (
     <StyledCard selected={selected} sx={{ display: "flex", flexDirection: "column", width: "100%", mb: 2 }}>
       {/* Airline Logos */}
@@ -187,21 +191,40 @@ const FlightCard = ({ flightCardDTO, direction, onSelectFlight}) => {
         </Box>
         <Divider sx={{ my: 1 }} />
 
-        {/* Book/Add Flight Button */}
-        <Button
-          fullWidth
-          sx={{ mt: 0, mb: 0, p: 0 }}
-          onClick={handleButtonClick}
-        >
-          {direction === 'origin'
-            ? 'Add Origin Flight'
-            : direction === 'return'
-            ? 'Add Return Flight'
-            : 'Book Flight'}
-        </Button>
+        {context === 'booking' ? (
+          <Button
+            fullWidth
+            sx={{ mt: 1 }}
+            onClick={() => {}}
+          >
+            Modify Booking
+          </Button>
+        ) : (
+          <Button
+            fullWidth
+            sx={{ mt: 0, mb: 0, p: 0 }}
+            onClick={handleButtonClick}
+          >
+            {direction === 'origin'
+              ? 'Add Origin Flight'
+              : direction === 'return'
+              ? 'Add Return Flight'
+              : 'Book Flight'}
+          </Button>
+        )}
       </CardContent>
     </StyledCard>
   );
+  } catch (error) {
+    console.error("Error rendering FlightCard:", error);
+    return (
+      <Card sx={{ p: 2, backgroundColor: "#ffe6e6" }}>
+        <Typography color="error" align="center">
+          Failed to load flight details.
+        </Typography>
+      </Card>
+    );
+  }
 };
 
 export default FlightCard;

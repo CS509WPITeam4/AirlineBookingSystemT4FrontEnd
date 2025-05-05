@@ -1,0 +1,133 @@
+{
+  "hash": "1bfb526b",
+  "configHash": "45b8fa28",
+  "lockfileHash": "79dcfb0c",
+  "browserHash": "871dd163",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "f92a4790",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "550a04df",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "991390e0",
+      "needsInterop": false
+    },
+    "@mui/material": {
+      "src": "../../node_modules/@mui/material/index.js",
+      "file": "@mui_material.js",
+      "fileHash": "7d80ea4c",
+      "needsInterop": false
+    },
+    "@mui/material/styles": {
+      "src": "../../node_modules/@mui/material/styles/index.js",
+      "file": "@mui_material_styles.js",
+      "fileHash": "7e0d3faa",
+      "needsInterop": false
+    },
+    "axios": {
+      "src": "../../node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "6d106de9",
+      "needsInterop": false
+    },
+    "@mui/icons-material/FlightTakeoff": {
+      "src": "../../node_modules/@mui/icons-material/esm/FlightTakeoff.js",
+      "file": "@mui_icons-material_FlightTakeoff.js",
+      "fileHash": "b50b57a3",
+      "needsInterop": false
+    },
+    "@mui/icons-material/Person": {
+      "src": "../../node_modules/@mui/icons-material/esm/Person.js",
+      "file": "@mui_icons-material_Person.js",
+      "fileHash": "88cb9874",
+      "needsInterop": false
+    },
+    "@mui/icons-material/CalendarToday": {
+      "src": "../../node_modules/@mui/icons-material/esm/CalendarToday.js",
+      "file": "@mui_icons-material_CalendarToday.js",
+      "fileHash": "2a266907",
+      "needsInterop": false
+    },
+    "@mui/icons-material/ArrowBack": {
+      "src": "../../node_modules/@mui/icons-material/esm/ArrowBack.js",
+      "file": "@mui_icons-material_ArrowBack.js",
+      "fileHash": "25dc5041",
+      "needsInterop": false
+    },
+    "@mui/icons-material/FlightLand": {
+      "src": "../../node_modules/@mui/icons-material/esm/FlightLand.js",
+      "file": "@mui_icons-material_FlightLand.js",
+      "fileHash": "85089206",
+      "needsInterop": false
+    },
+    "@mui/icons-material/AirplanemodeActive": {
+      "src": "../../node_modules/@mui/icons-material/esm/AirplanemodeActive.js",
+      "file": "@mui_icons-material_AirplanemodeActive.js",
+      "fileHash": "877fbc5b",
+      "needsInterop": false
+    },
+    "react-datepicker": {
+      "src": "../../node_modules/react-datepicker/dist/index.es.js",
+      "file": "react-datepicker.js",
+      "fileHash": "f2a842cf",
+      "needsInterop": false
+    },
+    "@mui/icons-material/AccessTime": {
+      "src": "../../node_modules/@mui/icons-material/esm/AccessTime.js",
+      "file": "@mui_icons-material_AccessTime.js",
+      "fileHash": "230549cc",
+      "needsInterop": false
+    },
+    "react-image-gallery": {
+      "src": "../../node_modules/react-image-gallery/build/image-gallery.es.js",
+      "file": "react-image-gallery.js",
+      "fileHash": "aa4c15aa",
+      "needsInterop": false
+    },
+    "date-fns": {
+      "src": "../../node_modules/date-fns/index.js",
+      "file": "date-fns.js",
+      "fileHash": "f8a455ae",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-HWKM6VGS": {
+      "file": "chunk-HWKM6VGS.js"
+    },
+    "chunk-TKHB4QMX": {
+      "file": "chunk-TKHB4QMX.js"
+    },
+    "chunk-E4AMVKXX": {
+      "file": "chunk-E4AMVKXX.js"
+    },
+    "chunk-C6WWHQR7": {
+      "file": "chunk-C6WWHQR7.js"
+    },
+    "chunk-IV5G7UMG": {
+      "file": "chunk-IV5G7UMG.js"
+    },
+    "chunk-SW6KM7PI": {
+      "file": "chunk-SW6KM7PI.js"
+    },
+    "chunk-UTGAZWBT": {
+      "file": "chunk-UTGAZWBT.js"
+    },
+    "chunk-YLDSBLSF": {
+      "file": "chunk-YLDSBLSF.js"
+    },
+    "chunk-DC5AMYBS": {
+      "file": "chunk-DC5AMYBS.js"
+    }
+  }
+}

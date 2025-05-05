@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -19,6 +20,7 @@ import {
 import { styled } from '@mui/material/styles';
 import PersonIcon from '@mui/icons-material/Person';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { format } from 'date-fns';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -33,20 +35,56 @@ const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error] = useState('');
   const [tabValue, setTabValue] = useState(0);
+  const [bookings, setBookings] = useState([]);
 
-  useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
+useEffect(() => {
+  const token = localStorage.getItem('token');
+  const userData = localStorage.getItem('user');
 
-    if (!token || !userData) {
-      navigate('/login');
-      return;
-    }
+  if (!token || !userData) {
+    navigate('/login');
+    return;
+  }
 
-    setUser(JSON.parse(userData));
-    setIsLoading(false);
-  }, [navigate]);
+  setUser(JSON.parse(userData));
+
+  axios.get('http://localhost:8080/api/bookings/retrieve', { params: { userId: JSON.parse(userData).id } })
+    .then(async response => {
+      const bookingsData = response.data;
+
+      const enrichedBookings = await Promise.all(
+        bookingsData.map(async booking => {
+          const departureDetails = await Promise.all(
+            (booking.departures || []).map(id =>
+              axios.get('http://localhost:8080/api/flights/details', { params: { id } })
+                .then(res => res.data)
+                .catch(() => null)
+            )
+          );
+          const returnDetails = await Promise.all(
+            (booking.returns || []).map(id =>
+              axios.get('http://localhost:8080/api/flights/details', { params: { id } })
+                .then(res => res.data)
+                .catch(() => null)
+            )
+          );
+
+          return {
+            ...booking,
+            departures: departureDetails.filter(Boolean),
+            returns: returnDetails.filter(Boolean),
+          };
+        })
+      );
+
+      setBookings(enrichedBookings);
+      setIsLoading(false);
+    })
+    .catch(error => {
+      console.error('Error fetching bookings:', error);
+      setIsLoading(false);
+    });
+}, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -65,6 +103,8 @@ const DashboardPage = () => {
   if (!user) {
     return null; // Will redirect to login in useEffect
   }
+  const [firstName, lastName] = user.username ? user.username.split('_') : ['John', 'Doe'];
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   return (
     <Container maxWidth="lg">
@@ -94,7 +134,7 @@ const DashboardPage = () => {
                   <PersonIcon fontSize="large" />
                 </Avatar>
                 <Typography variant="h5">
-                  {user.firstName || 'John'} {user.lastName || 'Doe'}
+                  {capitalize(firstName)} {capitalize(lastName)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {user.email || 'user@example.com'}
@@ -111,15 +151,6 @@ const DashboardPage = () => {
                   <ListItemText
                     primary="Account Details"
                     secondary="Manage your personal information"
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <CalendarTodayIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Travel History"
-                    secondary="View your trips"
                   />
                 </ListItem>
               </List>
@@ -158,8 +189,8 @@ const DashboardPage = () => {
                   onChange={handleTabChange}
                   variant="fullWidth"
                 >
-                  <Tab label="Upcoming Trips" />
-                  <Tab label="Past Trips" />
+                  <Tab label="Departure Flights" />
+                  <Tab label="Return Flights" />
                 </Tabs>
               </Box>
 
@@ -176,34 +207,81 @@ const DashboardPage = () => {
                   {tabValue === 0 && (
                     <>
                       <Typography variant="h6" sx={{ mb: 2 }}>
-                        Your Upcoming Trips
+                        Your Departure Flights
                       </Typography>
-
-                      <Box sx={{ textAlign: 'center', py: 4 }}>
-                        <Typography variant="body1" sx={{ mb: 2 }}>
-                          You don&#39;t have any upcoming trips.
-                        </Typography>
-                        <Button
-                          variant="contained"
-                          onClick={handleBookFlight}
-                        >
-                          Book a Flight
-                        </Button>
-                      </Box>
+                      {bookings.filter(b => b.departures.length > 0).length === 0 ? (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                          <Typography variant="body1" sx={{ mb: 2 }}>
+                            You don&#39;t have any departure flights.
+                          </Typography>
+                          <Button variant="contained" onClick={handleBookFlight}>
+                            Book a Flight
+                          </Button>
+                        </Box>
+                      ) : (
+                        bookings.map(booking =>
+                          booking.departures.map((flight, idx) => (
+                            <Box key={`${booking.id}-dep-${idx}`} sx={{ mb: 2, p: 2, border: '1px solid #ccc', borderRadius: '8px' }}>
+                              <Grid container alignItems="center" justifyContent="space-between">
+                                <Grid item xs={8}>
+                                  <Typography variant="body1">Flight Number: {flight.flightNumber}</Typography>
+                                  <Typography variant="body2">From: {flight.departAirport} To: {flight.arriveAirport}</Typography>
+                                  <Typography variant="body2">Departure: {format(new Date(flight.departDateTime), 'PPpp')}</Typography>
+                                  <Typography variant="body2">Arrival: {format(new Date(flight.arriveDateTime), 'PPpp')}</Typography>
+                                </Grid>
+                                <Grid item>
+                                  <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => navigate(`/modify-flight/${flight.id}`)}
+                                  >
+                                    Modify Flight
+                                  </Button>
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          ))
+                        )
+                      )}
                     </>
                   )}
 
                   {tabValue === 1 && (
                     <>
                       <Typography variant="h6" sx={{ mb: 2 }}>
-                        Your Past Trips
+                        Your Return Flights
                       </Typography>
-
-                      <Box sx={{ textAlign: 'center', py: 4 }}>
-                        <Typography variant="body1">
-                          No past trips to display.
-                        </Typography>
-                      </Box>
+                      {bookings.filter(b => b.returns.length > 0).length === 0 ? (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                          <Typography variant="body1">
+                            No return flights to display.
+                          </Typography>
+                        </Box>
+                      ) : (
+                        bookings.map(booking =>
+                          booking.returns.map((flight, idx) => (
+                            <Box key={`${booking.id}-ret-${idx}`} sx={{ mb: 2, p: 2, border: '1px solid #ccc', borderRadius: '8px' }}>
+                              <Grid container alignItems="center" justifyContent="space-between">
+                                <Grid item xs={8}>
+                                  <Typography variant="body1">Flight Number: {flight.flightNumber}</Typography>
+                                  <Typography variant="body2">From: {flight.departAirport} To: {flight.arriveAirport}</Typography>
+                                  <Typography variant="body2">Departure: {format(new Date(flight.departDateTime), 'PPpp')}</Typography>
+                                  <Typography variant="body2">Arrival: {format(new Date(flight.arriveDateTime), 'PPpp')}</Typography>
+                                </Grid>
+                                <Grid item>
+                                  <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => navigate(`/modify-flight/${flight.id}`)}
+                                  >
+                                    Modify Flight
+                                  </Button>
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          ))
+                        )
+                      )}
                     </>
                   )}
                 </>
