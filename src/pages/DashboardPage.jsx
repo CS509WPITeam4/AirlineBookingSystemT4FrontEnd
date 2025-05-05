@@ -94,7 +94,16 @@ const DashboardPage = () => {
                   <PersonIcon fontSize="large" />
                 </Avatar>
                 <Typography variant="h5">
-                  {user.firstName || 'John'} {user.lastName || 'Doe'}
+                  {user.username
+                    ? decodeURIComponent(user.username)
+                        .split('_')[0]
+                        .replace(/^\w/, c => c.toUpperCase())
+                    : 'John'}{' '}
+                  {user.username
+                    ? decodeURIComponent(user.username)
+                        .split('_')[1]
+                        .replace(/^\w/, c => c.toUpperCase())
+                    : 'Doe'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {user.email || 'user@example.com'}
